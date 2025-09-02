@@ -1,6 +1,6 @@
 // pages/api/save-recipe.ts  (or app/api/save-recipe/route.ts)
 import { NextApiRequest, NextApiResponse } from "next";
-import { supabase } from "../../../lib/supabase"; // adjust path if needed
+import { supabase } from "../../lib/supabase"; // adjust path if needed
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === "POST") {

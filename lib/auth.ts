@@ -1,22 +1,11 @@
-import { supabase } from "./supabase";
+import { supabase } from "@/lib/supabase";
 
-// Signup
-export const signUp = async (email: string, password: string) => {
-  const { data, error } = await supabase.auth.signUp({ email, password });
-  return { data, error };
-};
+export const signUp = (email: string, password: string) =>
+  supabase.auth.signUp({ email, password });
 
-// Login
-export const signIn = async (email: string, password: string) => {
-  const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-  return { data, error };
-};
+export const signIn = (email: string, password: string) =>
+  supabase.auth.signInWithPassword({ email, password });
 
-// Logout
-export const signOut = async () => {
-  const { error } = await supabase.auth.signOut();
-  return { error };
-};
+export const signOut = () => supabase.auth.signOut();
 
-// Get current user
 export const getUser = () => supabase.auth.getUser();
