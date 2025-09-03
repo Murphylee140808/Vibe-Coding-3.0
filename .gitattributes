@@ -1,0 +1,10 @@
+# Ensure consistent line endings
+* text=auto
+*.ts text
+*.tsx text
+*.js text
+*.jsx text
+*.json text
+*.css text
+*.scss text
+*.html text

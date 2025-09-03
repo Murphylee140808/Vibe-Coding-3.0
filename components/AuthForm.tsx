@@ -1,8 +1,16 @@
+"use client";
+
 import { useState } from "react";
 import { signUp, signIn, getUser } from "@/lib/auth";
 
 interface AuthFormProps {
   onLogin: (user: any) => void;
+}
+
+export interface Recipe {
+  title: string;
+  ingredients: string;
+  instructions: string;
 }
 
 const AuthForm = ({ onLogin }: AuthFormProps) => {
@@ -11,7 +19,7 @@ const AuthForm = ({ onLogin }: AuthFormProps) => {
   const [isLogin, setIsLogin] = useState(true);
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
 
@@ -19,9 +27,22 @@ const AuthForm = ({ onLogin }: AuthFormProps) => {
     if (isLogin) result = await signIn(email, password);
     else result = await signUp(email, password);
 
-    if (result.error) alert(result.error.message);
-    else {
+    if (result.error) {
+      alert(result.error.message);
+    } else {
       const { data } = await getUser();
+
+      if (!isLogin && data.user) {
+        // Create a user record in Supabase table
+        const { error } = await (await import("@/lib/supabase")).supabase
+          .from("users")
+          .insert({
+            id: data.user.id,
+            email: data.user.email
+          });
+        if (error) alert("Database error saving new user");
+      }
+
       onLogin(data.user);
     }
 
@@ -57,6 +78,22 @@ const AuthForm = ({ onLogin }: AuthFormProps) => {
       </p>
     </form>
   );
+};
+
+// Named export for saving recipes
+export const handleSave = async (recipe: Recipe, user: any) => {
+  if (!user) return alert("Please login first");
+
+  const res = await fetch("/api/save-recipe", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ recipe, userId: user.id })
+  });
+
+  const data = await res.json();
+
+  if (res.ok) alert(`Saved "${recipe.title}"!`);
+  else alert(`Error: ${data.error}`);
 };
 
 export default AuthForm;
